@@ -9,15 +9,15 @@
 
 > 这不是官方的“不用于训练”开关，不能保证服务商不保存、筛选或训练。API Key、聊天内容和工具描述仍会发送；文件上传、遥测和其他提供商不在处理范围内。[了解隐私边界](https://deepseek.com/harness/en/data-processing/)
 
-**版本：0.4.0-rc.2 · 适配 DSH 0.1.2-rc.1 · 已验收 Linux x86-64**
+**版本：0.4.1-rc.1 · 适配 DSH 0.1.2-rc.1 · Linux x86-64** · [npm](https://www.npmjs.com/package/dsh-request-privacy)
 
 ## 安装：三步完成
 
 在**运行 DSH 的那台机器**上操作。安装前先结束正在生成的回复，再停止 DSH；如果是在终端启动的，回到该终端按 `Ctrl+C`。
 
-### 1. 下载插件
+### 1. 确认 DSH 版本
 
-[点击下载插件安装包](https://github.com/jhckevin/dsh-request-privacy/releases/download/v0.4.0-rc.2/dsh-request-privacy-0.4.0-rc.2.tgz)，**不用解压**。
+已有 DSH 时运行 `dsh --version`，确认是 `0.1.2-rc.1`，然后进入下一步。
 
 <details>
 <summary>还没有安装 DSH？点这里</summary>
@@ -34,14 +34,18 @@ npm install -g pnpm@11.7.0 @deepseek-ai/dsh@0.1.2-rc.1 --registry=https://regist
 
 ### 2. 安装并重新启动
 
-在安装包所在文件夹打开终端，依次执行：
+直接在终端执行，无需先下载文件：
 
 ```sh
-dsh plugin --profile web add ./dsh-request-privacy-0.4.0-rc.2.tgz --registry=https://registry.npmmirror.com --ignore-scripts
+dsh plugin --profile web add dsh-request-privacy@0.4.1-rc.1 --registry=https://registry.npmjs.org/ --ignore-scripts
 dsh --profile web
 ```
 
 第一行安装插件，第二行启动 WebUI。无需下载源码、编译或手工改配置。
+
+安装的是公开预构建包，使用者无需 npm 账号或发布令牌。这里指定 npm 官方源，避免新版本尚未同步到镜像站；镜像同步后也可换用镜像源。不要用普通的 `npm install -g dsh-request-privacy` 代替，插件需要装进 DSH 的 profile。
+
+离线传递安装包时，可从 [GitHub Releases](https://github.com/jhckevin/dsh-request-privacy/releases) 下载 `.tgz`，把上述命令中的 `dsh-request-privacy@0.4.1-rc.1` 换成安装包的本地路径，不用解压。
 
 **首次安装后需要重启 DSH 一次。只刷新网页不够。** 安装和启动必须使用同一个 profile；这里使用默认网页配置 `web`。如果一直使用自定义 profile，请把两处 `web` 都换成自己的名称。
 
@@ -68,7 +72,7 @@ dsh --profile web
 
 ## 没看到入口怎么办？
 
-1. 确认安装命令没有报错，且下载的是 `.tgz` 安装包，不是 Source code。
+1. 确认安装命令没有报错；若提示找不到新版本，请使用上面的 npm 官方源命令。
 2. 确认安装与启动使用同一个 profile，且已经停止并重新启动 DSH。
 3. 刷新网页，在设置的插件列表搜索 `request-privacy`，三个组件应显示 `running`。
 
@@ -80,7 +84,7 @@ dsh --profile web
 
 ## 升级或卸载
 
-升级：停止 DSH → 下载新安装包 → 用新文件名重复安装命令 → 重新启动。
+升级：先确认新版本支持你的 DSH，停止 DSH，再用新版本号重复上述 `dsh plugin --profile web add` 命令并重新启动。当前预发布包使用 npm 的 `next` 通道；建议按本页固定版本安装，不盲目跨 DSH 版本升级。
 
 卸载：先停止 DSH，再执行：
 
@@ -102,8 +106,6 @@ dsh --profile web
 
 </details>
 
-## 测试与许可证
-
-构建、16 项自动测试、安装包检查及本机 Edge 设置界面验收通过。[测试记录](docs/RELEASE-040.md) · [公开 CI](https://github.com/jhckevin/dsh-request-privacy/actions) · [反馈问题](https://github.com/jhckevin/dsh-request-privacy/issues)
+## 许可证
 
 MIT 开源；上游代码及许可见 [第三方声明](THIRD_PARTY_NOTICES.md)。

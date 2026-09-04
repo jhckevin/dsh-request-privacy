@@ -9,15 +9,15 @@ One switch to reduce extra correlation metadata in DeepSeek Harness chat request
 
 > This is not an official training opt-out. It cannot guarantee that a provider will not retain, filter or train on data. API keys, chat content and tool descriptions are still sent. File uploads, telemetry and other providers are outside its scope. [Privacy limits](https://deepseek.com/harness/en/data-processing/)
 
-**Version: 0.4.0-rc.2 · DSH 0.1.2-rc.1 · Verified on Linux x86-64**
+**Version: 0.4.1-rc.1 · DSH 0.1.2-rc.1 · Linux x86-64** · [npm](https://www.npmjs.com/package/dsh-request-privacy)
 
 ## Install in three steps
 
 Do this **on the machine running DSH**. Let active replies finish, then stop DSH. For a terminal launch, return to that terminal and press `Ctrl+C`.
 
-### 1. Download
+### 1. Check your DSH version
 
-[Download the plugin package](https://github.com/jhckevin/dsh-request-privacy/releases/download/v0.4.0-rc.2/dsh-request-privacy-0.4.0-rc.2.tgz). **Do not extract it.**
+Run `dsh --version`. If it reports `0.1.2-rc.1`, continue to the next step.
 
 <details>
 <summary>Do not have DSH installed yet?</summary>
@@ -34,14 +34,18 @@ Already using DSH? Check with `dsh --version`. Other DSH versions and operating 
 
 ### 2. Install and restart
 
-Open a terminal in the folder containing the downloaded package. Run these commands in order:
+Run these commands in a terminal. No manual download is needed:
 
 ```sh
-dsh plugin --profile web add ./dsh-request-privacy-0.4.0-rc.2.tgz --registry=https://registry.npmmirror.com --ignore-scripts
+dsh plugin --profile web add dsh-request-privacy@0.4.1-rc.1 --registry=https://registry.npmjs.org/ --ignore-scripts
 dsh --profile web
 ```
 
 The first command installs the plugin; the second starts the WebUI. No source checkout, compilation or manual configuration is required.
+
+This is a public prebuilt package: users do not need an npm account or publishing token. The official registry avoids mirror synchronization delays for a new release. Do not substitute `npm install -g dsh-request-privacy`: DSH needs the bundle in its profile.
+
+For file-based installation, download the `.tgz` from [GitHub Releases](https://github.com/jhckevin/dsh-request-privacy/releases) and replace `dsh-request-privacy@0.4.1-rc.1` in the command with the local file path. Do not extract it.
 
 **Restart DSH once after first installation. A browser refresh is not enough.** Install and start using the same profile. This guide uses the standard `web` profile; if you use a custom profile, replace both occurrences of `web`.
 
@@ -68,7 +72,7 @@ Toggle **Minimize request headers** and wait for the saved confirmation. Keep us
 
 ## Cannot find the settings entry?
 
-1. Check that installation succeeded and you downloaded the `.tgz` package, not Source code.
+1. Check that installation succeeded. If the version is not found, use the official registry command above.
 2. Use the same profile for installation and startup, and fully restart DSH.
 3. Refresh the page. In Settings, search the plugin list for `request-privacy`. All three components should show `running`.
 
@@ -80,7 +84,7 @@ If DSH runs on a server, install the plugin there. Use your existing secure conn
 
 ## Update or uninstall
 
-Update: stop DSH → download the new package → repeat installation with the new filename → restart.
+Update: check DSH compatibility, stop DSH, repeat `dsh plugin --profile web add` with the new version, then restart. Prereleases use the npm `next` tag; prefer the pinned version above rather than upgrading across DSH versions blindly.
 
 To uninstall, stop DSH first, then run:
 
@@ -102,8 +106,6 @@ This restores the official DeepSeek adapter.
 
 </details>
 
-## Tests and license
-
-Build, 16 automated tests, packed-consumer checks and local Edge settings acceptance pass. [Test notes](docs/RELEASE-040.md) · [CI](https://github.com/jhckevin/dsh-request-privacy/actions) · [Report a problem](https://github.com/jhckevin/dsh-request-privacy/issues)
+## License
 
 MIT licensed. Retained upstream code is credited in [third-party notices](THIRD_PARTY_NOTICES.md).
