@@ -2,101 +2,108 @@
 
 [中文](README.md) · English
 
-One switch for DeepSeek Harness: **send less extra correlation metadata while keeping your chats working.**
+One switch to reduce extra correlation metadata in DeepSeek Harness chat requests.
 
-When enabled, DeepSeek chat requests use a `private-client` identity and omit Harness user, session and compaction headers. When disabled, the next request uses native headers again. Turning it off does not block your chat.
+**On:** use a `private-client` identity and omit Harness user, session and compaction headers.  
+**Off:** restore native headers on the next request. Chatting continues normally, including existing sessions.
 
-> **This is not an official training opt-out.** Fewer headers do not guarantee that a provider will not retain, filter or train on data. Your API key, chat content and tool descriptions are still sent. File uploads, telemetry and other providers are outside this switch. See [DeepSeek's data processing statement](https://deepseek.com/harness/en/data-processing/).
+> This is not an official training opt-out. It cannot guarantee that a provider will not retain, filter or train on data. API keys, chat content and tool descriptions are still sent. File uploads, telemetry and other providers are outside its scope. [Privacy limits](https://deepseek.com/harness/en/data-processing/)
 
-Prerelease: **0.4.0-rc.2**, for **DSH 0.1.2-rc.1**. Build, 16 automated tests and local Edge UI acceptance pass.
+**Version: 0.4.0-rc.2 · DSH 0.1.2-rc.1 · Verified on Linux x86-64**
 
-## Install once
+## Install in three steps
 
-### 1. Have DSH ready
+Do this **on the machine running DSH**. Let active replies finish, then stop DSH. For a terminal launch, return to that terminal and press `Ctrl+C`.
 
-Already using this DSH version? Skip to step 2.
+### 1. Download
 
-Otherwise install [Node.js 24](https://nodejs.org/), then open a terminal and run:
+[Download the plugin package](https://github.com/jhckevin/dsh-request-privacy/releases/download/v0.4.0-rc.2/dsh-request-privacy-0.4.0-rc.2.tgz). **Do not extract it.**
+
+<details>
+<summary>Do not have DSH installed yet?</summary>
+
+Install [Node.js 24](https://nodejs.org/), open a terminal, then run:
 
 ```sh
 npm install -g pnpm@11.7.0 @deepseek-ai/dsh@0.1.2-rc.1 --registry=https://registry.npmmirror.com
-dsh --version
 ```
 
-Release acceptance targets Linux x86-64. Other systems have not been verified.
+Already using DSH? Check with `dsh --version`. Other DSH versions and operating systems have not been verified; do not blindly overwrite another version you use.
 
-### 2. Download the plugin
+</details>
 
-Download `dsh-request-privacy-0.4.0-rc.2.tgz` from [Releases](https://github.com/jhckevin/dsh-request-privacy/releases). **Do not extract it.** GitHub's automatic Source code archives are not installable plugin packages.
+### 2. Install and restart
 
-### 3. Install and restart DSH
-
-Stop DSH first. Open a terminal in your download folder:
+Open a terminal in the folder containing the downloaded package. Run these commands in order:
 
 ```sh
 dsh plugin --profile web add ./dsh-request-privacy-0.4.0-rc.2.tgz --registry=https://registry.npmmirror.com --ignore-scripts
 dsh --profile web
 ```
 
-Open the URL printed in the terminal. It may contain a login token; do not share it.
+The first command installs the plugin; the second starts the WebUI. No source checkout, compilation or manual configuration is required.
 
-**First installation requires restarting DSH.** Refreshing the browser is not a host restart. Install and start with the same profile; these instructions use the `web` profile.
+**Restart DSH once after first installation. A browser refresh is not enough.** Install and start using the same profile. This guide uses the standard `web` profile; if you use a custom profile, replace both occurrences of `web`.
 
-In Settings, search the plugin list for `request-privacy`. All three components should be running (example shown in Chinese):
+### 3. Open settings
 
-![Installed plugin components](docs/images/installed.png)
+Open the URL printed by DSH → **Settings** at the bottom left → **Request Privacy**.
 
-## Use one switch
+Toggle **Minimize request headers** and wait for the saved confirmation. Keep using your usual DeepSeek model; stored credentials, model and endpoint settings are reused.
 
-1. Open **Settings** at the bottom left.
-2. Select **Request Privacy**.
-3. Toggle **Minimize request headers** and wait for the saved confirmation. It saves automatically.
-4. Return to your chat and use your usual **DeepSeek** model.
+![Request Privacy enabled](docs/images/settings-on-en.png)
 
-No new session or provider selection is needed. The native `deepseek-official` route is covered, keeping its model, endpoint and stored credential settings. The older `deepseek-private` route remains for compatibility; new users do not need it.
+## When does the switch take effect?
 
 | Action | Result |
 | --- | --- |
-| Enable successfully | New requests use minimized headers, including existing chats |
-| Disable successfully | New requests use native headers; chatting still works |
+| Enable successfully | The next DeepSeek request uses minimized headers, including new messages in existing chats |
+| Disable successfully | The next request restores native headers; chatting still works |
 | Toggle during a reply | The active request keeps its mode; the next request uses the new setting |
-| Refresh or restart | Saved settings are retained |
+| Refresh or restart DSH | Saved settings are retained |
 
-The next request includes later model calls in the same turn and title/compaction calls using this DeepSeek route. It cannot recall data already sent. Existing history, summaries and tool descriptions are not scrubbed.
+**The switch saves automatically and needs no restart after installation.** The next request also includes later model calls in the same turn and title/compaction calls using the same DeepSeek route. Previously sent data cannot be recalled; existing history is not scrubbed.
 
-Enabled: minimized identity and omitted correlation metadata.
+![Request Privacy disabled](docs/images/settings-off-en.png)
 
-![Enabled settings](docs/images/settings-on-en.png)
+## Cannot find the settings entry?
 
-Disabled: saved immediately; the next request uses native headers.
+1. Check that installation succeeded and you downloaded the `.tgz` package, not Source code.
+2. Use the same profile for installation and startup, and fully restart DSH.
+3. Refresh the page. In Settings, search the plugin list for `request-privacy`. All three components should show `running`.
 
-![Disabled settings](docs/images/settings-off-en.png)
+![Installed components, shown in Chinese](docs/images/installed.png)
+
+If you see `pnpm: command not found`, run `npm install -g pnpm@11.7.0 --registry=https://registry.npmmirror.com`, then retry.
+
+If DSH runs on a server, install the plugin there. Use your existing secure connection to its WebUI; do not expose a new public port just for this plugin. Startup URLs may contain login tokens: do not share them.
 
 ## Update or uninstall
 
-Update: stop DSH, download the new package, repeat the install command, then restart.
+Update: stop DSH → download the new package → repeat installation with the new filename → restart.
 
-Uninstall: stop DSH, then run:
+To uninstall, stop DSH first, then run:
 
 ```sh
 dsh plugin --profile web remove dsh-request-privacy
 dsh --profile web
 ```
 
-This restores the official DeepSeek adapter. Do not remove package files during an active chat.
+This restores the official DeepSeek adapter.
 
-## Questions
+<details>
+<summary>Advanced configuration and limitations</summary>
 
-**No settings entry?** Check that both installation and startup use `--profile web`, restart DSH, then refresh the browser.
+- Covers the native `deepseek-official` route. The legacy `deepseek-private` route remains compatible, but new users do not need it.
+- Only integrated DeepSeek chat requests are covered; other providers and third-party adapters are unchanged.
+- Regular UI settings need no migration. Handwritten YAML on the original `llm-deepseek` row needs migration: see [advanced notes](docs/architecture.md).
+- API keys, IP addresses and content may still correlate requests. This is not anonymization or a guaranteed training opt-out.
+- Uses the official DSH [profile plugin mechanism](https://github.com/deepseek-ai/deepseek-harness/blob/dsh-v0.1.2-rc.1/apps/cli/src/plugin.ts) without modifying host files.
 
-**Completely anonymous?** No. Providers can still correlate your API key, IP and content. This plugin does not switch off separate DSH telemetry.
+</details>
 
-**Custom YAML deployment?** Settings entered in the regular UI do not need migration. Handwritten configuration on the original `llm-deepseek` row must be moved to the replacement row: see [advanced notes](docs/architecture.md).
+## Tests and license
 
-**Other providers?** Unchanged. Only the DeepSeek routes integrated by this plugin are covered.
+Build, 16 automated tests, packed-consumer checks and local Edge settings acceptance pass. [Test notes](docs/RELEASE-040.md) · [CI](https://github.com/jhckevin/dsh-request-privacy/actions) · [Report a problem](https://github.com/jhckevin/dsh-request-privacy/issues)
 
-## Verification and license
-
-[Test notes](docs/RELEASE-040.md) · [CI](https://github.com/jhckevin/dsh-request-privacy/actions) · [Report a problem](https://github.com/jhckevin/dsh-request-privacy/issues)
-
-MIT licensed. Uses DSH's official plugin composition without modifying host files. Retained upstream code is credited in [third-party notices](THIRD_PARTY_NOTICES.md).
+MIT licensed. Retained upstream code is credited in [third-party notices](THIRD_PARTY_NOTICES.md).
