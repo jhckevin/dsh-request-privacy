@@ -1,0 +1,34 @@
+name: CI
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  linux-x64:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.20.0'
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund --registry=https://registry.npmmirror.com
+      - name: Build and test
+        shell: bash
+        run: |
+          mkdir -p artifacts
+          set -o pipefail
+          npm run check 2>&1 | tee artifacts/check.log
+          npx vitest run --reporter=junit --outputFile=artifacts/junit.xml
+      - name: Verify distributable
+        run: node scripts/check-release.mjs
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: privacy-linux-x64
+          path: artifacts/
+          if-no-files-found: error
+          retention-days: 30
