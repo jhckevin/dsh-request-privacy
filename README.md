@@ -8,7 +8,7 @@
 
 > **这不是官方的“不用于训练”开关。** 修改请求头只能减少额外元数据，不能保证服务商不保存、筛选或训练。API Key、聊天内容、工具描述仍会发送；文件上传、遥测及其他提供商不在本插件的请求头处理范围内。参见 [DeepSeek 数据处理说明](https://deepseek.com/harness/en/data-processing/)。
 
-当前候选版本：**0.4.0-rc.2**，匹配 **DSH 0.1.2-rc.1**。构建及 16 项测试通过；新版浏览器截图和完整界面验收尚待完成，正式 Release 尚未发布。
+当前预发布版本：**0.4.0-rc.2**，匹配 **DSH 0.1.2-rc.1**。构建、16 项自动测试和本机 Edge 界面验收通过。
 
 ## 安装：只需做一次
 
@@ -27,7 +27,7 @@ dsh --version
 
 ### 2. 下载插件
 
-正式发布后，到 [Releases](https://github.com/jhckevin/dsh-request-privacy/releases) 下载 `dsh-request-privacy-0.4.0-rc.2.tgz`，**不用解压**。不要下载 GitHub 自动生成的 Source code 压缩包。
+到 [Releases](https://github.com/jhckevin/dsh-request-privacy/releases) 下载 `dsh-request-privacy-0.4.0-rc.2.tgz`，**不用解压**。不要下载 GitHub 自动生成的 Source code 压缩包。
 
 ### 3. 安装，然后重启 DSH
 
@@ -41,6 +41,10 @@ dsh --profile web
 打开终端给出的网页地址。地址可能带有登录令牌，请勿转发。
 
 **首次安装需要重新启动 DSH**，刷新网页不等于重启。插件安装在哪个 profile，就只影响那个 profile；本文使用 WebUI 的 `web` profile。
+
+可在设置的插件列表搜索 `request-privacy`，确认三个组件均为 running：
+
+![安装后插件运行状态](docs/images/installed.png)
 
 ## 使用：一个开关即可
 
@@ -60,7 +64,13 @@ dsh --profile web
 
 “下一次请求”也包括同一轮对话后续的模型调用，以及经由这个 DeepSeek 入口的标题、压缩请求。不会撤回已经发送的数据。已有历史内容、摘要或工具描述不会被清洗。
 
-界面截图将来自这个版本的真实浏览器验收，不使用旧版图片或效果图代替。
+开启：显示精简身份和不再附带的关联信息。
+
+![开启请求头精简](docs/images/settings-on.png)
+
+关闭：立即保存，下一次请求恢复原生身份。
+
+![关闭并恢复原生请求头](docs/images/settings-off.png)
 
 ## 升级或卸载
 

@@ -19,6 +19,10 @@ const zh = {
   nativeStatus: '已关闭 · 使用原生请求头', overrideStatus: '已开启 · 精简请求头', loading: '正在读取设置…', unavailable: '设置服务不可用。',
   boundary: '这不是官方的训练退出开关。服务商仍会收到 API Key 和聊天内容；文件上传及其他提供商不在本开关范围内。',
   offHint: '关闭时恢复原生用户标识、会话标识，以及压缩请求标记（如适用）。此处不展示这些标识的实际值。',
+  userId: 'Harness 用户标识', sessionId: '会话关联标识', compaction: '压缩请求标记',
+  auth: 'API Key（身份验证）', contentType: '请求内容类型', accept: '响应格式',
+  messages: '你发送的消息', toolSchemas: '扩展工具的定义', modelParameters: '模型参数',
+  noneOmitted: '已关闭精简，按原生规则发送。',
 }
 const en = {
   nav: 'Request Privacy', title: 'Request Privacy', subtitle: 'Send less extra correlation metadata to DeepSeek without changing your chat.',
@@ -29,9 +33,20 @@ const en = {
   nativeStatus: 'Off · Native request headers', overrideStatus: 'On · Minimized headers', loading: 'Loading settings…', unavailable: 'Settings service is unavailable.',
   boundary: 'Not an official training opt-out. Your provider still receives your API key and chat content. File uploads and other providers are outside this switch.',
   offHint: 'When off, native user/session identifiers and the compaction marker are restored where applicable. Their actual values are not shown here.',
+  userId: 'Harness user identifier', sessionId: 'Session correlation identifier', compaction: 'Compaction marker',
+  auth: 'API key (authentication)', contentType: 'Request content type', accept: 'Response format',
+  messages: 'Your messages', toolSchemas: 'Extension tool definitions', modelParameters: 'Model parameters',
+  noneOmitted: 'Minimization is off; native rules apply.',
 }
 
 type LocaleKey = keyof typeof en
+const METADATA_LABELS: Record<string, LocaleKey> = {
+  'product user id': 'userId', 'session correlation id': 'sessionId',
+  'compaction classification': 'compaction', authorization: 'auth',
+  'content-type': 'contentType', accept: 'accept',
+  'user-authored messages': 'messages', 'user-authored extension tool schemas': 'toolSchemas',
+  'model parameters': 'modelParameters',
+}
 declare module '@deepseek-ai/dsh-client-ui-slots' {
   interface LocaleNamespaceMap { 'settings.requestPrivacy': LocaleKey }
 }
@@ -98,8 +113,8 @@ function RequestPrivacySection({ read, update, reset, t }: Props): ReactNode {
       </div>
       <div className="rp-grid">
         <article><h3>{t('preview')}</h3>{Object.entries(snapshot.preview.sent).map(([key, value]) => <code key={key}>{key}: {value}</code>)}</article>
-        <article><h3>{t('omitted')}</h3><ul>{snapshot.preview.omitted.map(value => <li key={value}>{value}</li>)}</ul></article>
-        <article><h3>{t('immutable')}</h3><ul>{snapshot.preview.immutable.map(value => <li key={value}>{value}</li>)}</ul></article>
+        <article><h3>{t('omitted')}</h3>{snapshot.preview.omitted.length === 0 ? <p>{t('noneOmitted')}</p> : <ul>{snapshot.preview.omitted.map(value => <li key={value}>{METADATA_LABELS[value] ? t(METADATA_LABELS[value]) : value}</li>)}</ul>}</article>
+        <article><h3>{t('immutable')}</h3><ul>{snapshot.preview.immutable.map(value => <li key={value}>{METADATA_LABELS[value] ? t(METADATA_LABELS[value]) : value}</li>)}</ul></article>
       </div>
       <footer>
         <span className={`rp-status ${snapshot.enabled ? 'rp-status-override' : 'rp-status-native'}`} role="status">
@@ -125,7 +140,13 @@ export function apply(ctx: Context): void {
     const style = document.createElement('style')
     style.dataset.plugin = 'dsh-request-privacy'
     style.dataset.pluginCss = STYLE_ID
-    style.textContent = CSS
+    style.textContent = CSS + `
+      .rp-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .rp-grid article:first-child{grid-column:1/-1}
+      .rp-page button:last-child{background:var(--dsw-alias-bg-layer-1);color:var(--dsw-alias-label-primary)}
+      .rp-card p,.rp-grid p,.rp-grid li{line-height:1.5}
+      @media(max-width:760px){.rp-grid{grid-template-columns:1fr}}
+    `
     document.head.appendChild(style)
     return () => { style.remove() }
   }, 'request-privacy webui: styles')

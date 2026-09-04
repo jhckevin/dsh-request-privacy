@@ -8,7 +8,7 @@ When enabled, DeepSeek chat requests use a `private-client` identity and omit Ha
 
 > **This is not an official training opt-out.** Fewer headers do not guarantee that a provider will not retain, filter or train on data. Your API key, chat content and tool descriptions are still sent. File uploads, telemetry and other providers are outside this switch. See [DeepSeek's data processing statement](https://deepseek.com/harness/en/data-processing/).
 
-Release candidate: **0.4.0-rc.2**, for **DSH 0.1.2-rc.1**. Build and 16 tests pass. Current-version browser screenshots and full UI acceptance are still pending; no final Release has been published.
+Prerelease: **0.4.0-rc.2**, for **DSH 0.1.2-rc.1**. Build, 16 automated tests and local Edge UI acceptance pass.
 
 ## Install once
 
@@ -27,7 +27,7 @@ Release acceptance targets Linux x86-64. Other systems have not been verified.
 
 ### 2. Download the plugin
 
-After publication, download `dsh-request-privacy-0.4.0-rc.2.tgz` from [Releases](https://github.com/jhckevin/dsh-request-privacy/releases). **Do not extract it.** GitHub's automatic Source code archives are not installable plugin packages.
+Download `dsh-request-privacy-0.4.0-rc.2.tgz` from [Releases](https://github.com/jhckevin/dsh-request-privacy/releases). **Do not extract it.** GitHub's automatic Source code archives are not installable plugin packages.
 
 ### 3. Install and restart DSH
 
@@ -41,6 +41,10 @@ dsh --profile web
 Open the URL printed in the terminal. It may contain a login token; do not share it.
 
 **First installation requires restarting DSH.** Refreshing the browser is not a host restart. Install and start with the same profile; these instructions use the `web` profile.
+
+In Settings, search the plugin list for `request-privacy`. All three components should be running (example shown in Chinese):
+
+![Installed plugin components](docs/images/installed.png)
 
 ## Use one switch
 
@@ -60,7 +64,13 @@ No new session or provider selection is needed. The native `deepseek-official` r
 
 The next request includes later model calls in the same turn and title/compaction calls using this DeepSeek route. It cannot recall data already sent. Existing history, summaries and tool descriptions are not scrubbed.
 
-Screenshots will come from real browser acceptance of this version, not old images or mockups.
+Enabled: minimized identity and omitted correlation metadata.
+
+![Enabled settings](docs/images/settings-on-en.png)
+
+Disabled: saved immediately; the next request uses native headers.
+
+![Disabled settings](docs/images/settings-off-en.png)
 
 ## Update or uninstall
 
