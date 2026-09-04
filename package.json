@@ -1,9 +1,14 @@
 {
   "name": "dsh-request-privacy",
-  "version": "0.4.0-rc.2",
+  "version": "0.4.1-rc.1",
   "description": "Provider request metadata minimization extension for DeepSeek Harness",
   "type": "module",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/",
+    "tag": "next"
+  },
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "exports": {

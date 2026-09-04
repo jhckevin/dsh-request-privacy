@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.1-rc.1 — npm 安装
+
+- 提供预构建 npm 包，通过 DSH 原生 `plugin add` 安装，无需下载或解压 tgz。
+- 中英文安装、升级说明改用明确版本的 npm 命令；保留 GitHub 安装包作为备用。
+- 固定发布到 npm 官方源的 `next` 通道，不覆盖已有 GitHub Release。
+- 隐私处理、默认设置及 DSH 0.1.2-rc.1 兼容范围不变。
+
 ## 0.4.0-rc.2 — 原生入口实时开关（候选版）
 
 - 默认 DeepSeek 入口接入精简请求头，已有会话无需换 provider。
