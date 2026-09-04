@@ -1,0 +1,31 @@
+# Request-metadata minimization adapter and its bounded WebUI settings bridge.
+# Keep the native provider id, credentials and model settings for existing sessions.
+- id: llm-deepseek
+  name: '@deepseek-ai/dsh-llm-deepseek'
+  disabled: true
+- insert:
+    # One lifecycle boundary makes the whole server-side extension reversible.
+    # A profile patch can hot-disable this id and Cordis will dispose all child
+    # fibers in the running process before the package is removed from disk.
+    - id: request-privacy-bundle
+      name: '@deepseek-ai/cordis-plugin-group'
+      group: true
+      config:
+        - id: request-privacy-native-provider
+          name: 'dsh-request-privacy/native-provider'
+
+        - id: request-privacy
+          name: 'dsh-request-privacy'
+          config:
+            enabled: true
+            identity: private-client
+            omitCorrelationHeaders: true
+            apiKeyEnv: DEEPSEEK_API_KEY
+            thinking: enabled
+            reasoningEffort: high
+
+        - id: request-privacy-settings
+          name: 'dsh-request-privacy/settings-provider'
+          inject: [settings]
+
+# Prompt rewriting is deliberately not installed: this bundle changes chat headers only.

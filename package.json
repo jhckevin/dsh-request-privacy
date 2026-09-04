@@ -1,0 +1,148 @@
+{
+  "name": "dsh-request-privacy",
+  "version": "0.4.0-rc.2",
+  "description": "Provider request metadata minimization extension for DeepSeek Harness",
+  "type": "module",
+  "license": "MIT",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "exports": {
+    "./native-provider": {
+      "types": "./lib/native-provider.d.ts",
+      "default": "./lib/native-provider.js"
+    },
+    ".": {
+      "types": "./lib/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./settings-provider": {
+      "types": "./lib/settings-provider.d.ts",
+      "default": "./lib/settings-provider.js"
+    },
+    "./prompt-privacy": {
+      "types": "./lib/prompt-privacy.d.ts",
+      "default": "./lib/prompt-privacy.js"
+    },
+    "./client": {
+      "types": "./lib/client/index.d.ts",
+      "default": "./lib/client.js"
+    },
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "vendor/*.js",
+    "vendor/*.d.ts",
+    "docs/images/*.png",
+    "lib/**/*.js",
+    "lib/**/*.d.ts",
+    "lib/client.js.map",
+    "cordis.patch.yml",
+    "README.md",
+    "README.en.md",
+    "docs/**/*.md",
+    "docs/images/*.jpg",
+    "CHANGELOG.md",
+    "THIRD_PARTY_NOTICES.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json && tsdown --config tsdown.client.config.ts",
+    "prepare": "npm run build",
+    "test": "vitest run",
+    "check": "npm run build && npm run test",
+    "pack:check": "npm pack --dry-run",
+    "test:live": "node scripts/live-smoke.mjs"
+  },
+  "keywords": [
+    "deepseek-harness",
+    "dsh-plugin",
+    "dsh-bundle",
+    "llm-adapter",
+    "web-client-extension",
+    "request-metadata"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "inject": [
+        "@deepseek-ai/dsh-client-connection",
+        "@deepseek-ai/dsh-client-modules",
+        "@deepseek-ai/dsh-client-locale",
+        "@deepseek-ai/dsh-client-ui-settings",
+        "@deepseek-ai/dsh-api-remotes",
+        "@deepseek-ai/dsh-client-ui-renderer"
+      ],
+      "platform": "web"
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/dsh-llm-deepseek": "0.1.2-rc.1",
+    "@deepseek-ai/dsh-atomic-write": "0.1.2-rc.1",
+    "@deepseek-ai/dsh-attachment": "0.1.2-rc.1",
+    "@deepseek-ai/dsh-home-paths": "0.1.2-rc.1",
+    "@deepseek-ai/dsh-brand": "0.1.2-rc.1",
+    "@deepseek-ai/cordis": "^4.0.2",
+    "@deepseek-ai/dsh-anonymous-user-id": "0.1.2-rc.1",
+    "@deepseek-ai/dsh-api-remotes": "0.1.2-rc.1",
+    "@deepseek-ai/dsh-client-connection": "0.1.2-rc.1",
+    "@deepseek-ai/dsh-client-locale": "0.1.2-rc.1",
+    "@deepseek-ai/dsh-client-modules": "0.1.2-rc.1",
+    "@deepseek-ai/dsh-client-ui-settings": "0.1.2-rc.1",
+    "@deepseek-ai/dsh-client-ui-slots": "0.1.2-rc.1",
+    "@deepseek-ai/dsh-credentials": "0.1.2-rc.1",
+    "@deepseek-ai/dsh-launch-environment": "0.1.2-rc.1",
+    "@deepseek-ai/dsh-llm": "0.1.2-rc.1",
+    "@deepseek-ai/dsh-settings": "0.1.2-rc.1",
+    "@deepseek-ai/dsh-system-prompt": "0.1.2-rc.1",
+    "@deepseek-ai/dsh-timeout": "0.1.2-rc.1",
+    "@deepseek-ai/dsh-typert-protocol": "0.1.2-rc.1",
+    "react": "^18.2.0",
+    "@deepseek-ai/dsh-util-values": "0.1.2-rc.1",
+    "@deepseek-ai/dsh-client-ui-renderer": "0.1.2-rc.1"
+  },
+  "devDependencies": {
+    "@deepseek-ai/cordis": "^4.0.2",
+    "@deepseek-ai/dsh-anonymous-user-id": "0.1.2-rc.1",
+    "@deepseek-ai/dsh-api-remotes": "0.1.2-rc.1",
+    "@deepseek-ai/dsh-client-connection": "0.1.2-rc.1",
+    "@deepseek-ai/dsh-client-locale": "0.1.2-rc.1",
+    "@deepseek-ai/dsh-client-modules": "0.1.2-rc.1",
+    "@deepseek-ai/dsh-client-ui-renderer": "0.1.2-rc.1",
+    "@deepseek-ai/dsh-client-ui-settings": "0.1.2-rc.1",
+    "@deepseek-ai/dsh-client-ui-slots": "0.1.2-rc.1",
+    "@deepseek-ai/dsh-credentials": "0.1.2-rc.1",
+    "@deepseek-ai/dsh-launch-environment": "0.1.2-rc.1",
+    "@deepseek-ai/dsh-llm": "0.1.2-rc.1",
+    "@deepseek-ai/dsh-settings": "0.1.2-rc.1",
+    "@deepseek-ai/dsh-system-prompt": "0.1.2-rc.1",
+    "@deepseek-ai/dsh-timeout": "0.1.2-rc.1",
+    "@deepseek-ai/dsh-typert-protocol": "0.1.2-rc.1",
+    "@deepseek-ai/dsh-util-values": "0.1.2-rc.1",
+    "@deepseek-ai/schemastery": "^3.18.2",
+    "@types/node": "^24.0.0",
+    "@types/react": "~18.3.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "tsdown": "^0.22.2",
+    "typescript": "^5.9.0",
+    "vitest": "^3.2.4"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "dependencies": {
+    "eventsource-parser": "^3.1.1"
+  },
+  "author": "jhckevin",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jhckevin/dsh-request-privacy.git"
+  },
+  "homepage": "https://github.com/jhckevin/dsh-request-privacy",
+  "bugs": {
+    "url": "https://github.com/jhckevin/dsh-request-privacy/issues"
+  }
+}

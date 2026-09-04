@@ -1,0 +1,15 @@
+node_modules/
+artifacts/
+lib/
+*.tgz
+coverage/
+.vitest/
+tests/fixtures/
+acceptance/node_modules/
+acceptance/home/
+acceptance/workspace/
+acceptance/*.tgz
+acceptance/*.png
+acceptance/*.txt
+acceptance/*-results.json
+acceptance/*-failure.json
