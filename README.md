@@ -9,7 +9,7 @@
 
 > 这不是官方的“不用于训练”开关，不能保证服务商不保存、筛选或训练。API Key、聊天内容和工具描述仍会发送；文件上传、遥测和其他提供商不在处理范围内。[了解隐私边界](https://deepseek.com/harness/en/data-processing/)
 
-**版本：0.4.1-rc.1 · 适配 DSH 0.1.2-rc.1 · Linux x86-64** · [npm](https://www.npmjs.com/package/dsh-request-privacy)
+**版本：0.4.2-rc.2 · 适配 DSH 0.1.2-rc.1 · Linux x86-64** · [npm](https://www.npmjs.com/package/dsh-request-privacy)
 
 ## 安装：三步完成
 
@@ -41,11 +41,18 @@ dsh plugin --profile web add dsh-request-privacy@0.4.1-rc.1 --registry=https://r
 dsh --profile web
 ```
 
-第一行安装插件，第二行启动 WebUI。无需下载源码、编译或手工改配置。
+第一行安装 npm 已发布版 `0.4.1-rc.1`，第二行启动 WebUI。无需下载源码、编译或手工改配置。
+
+本页候选版 `0.4.2-rc.2` 尚未发布到 npm。体验本轮更新，请从 [GitHub 预发布](https://github.com/jhckevin/dsh-request-privacy/releases/tag/v0.4.2-rc.2) 下载 `dsh-request-privacy-0.4.2-rc.2.tgz`，执行：
+
+```sh
+dsh plugin --profile web add ./dsh-request-privacy-0.4.2-rc.2.tgz --ignore-scripts
+dsh --profile web
+```
 
 安装的是公开预构建包，使用者无需 npm 账号或发布令牌。这里指定 npm 官方源，避免新版本尚未同步到镜像站；镜像同步后也可换用镜像源。不要用普通的 `npm install -g dsh-request-privacy` 代替，插件需要装进 DSH 的 profile。
 
-离线传递安装包时，可从 [GitHub Releases](https://github.com/jhckevin/dsh-request-privacy/releases) 下载 `.tgz`，把上述命令中的 `dsh-request-privacy@0.4.1-rc.1` 换成安装包的本地路径，不用解压。
+离线传递安装包时，可从 [GitHub Releases](https://github.com/jhckevin/dsh-request-privacy/releases) 下载 `.tgz`，把上述命令中的 `dsh-request-privacy@0.4.2-rc.2` 换成安装包的本地路径，不用解压。
 
 **首次安装后需要重启 DSH 一次。只刷新网页不够。** 安装和启动必须使用同一个 profile；这里使用默认网页配置 `web`。如果一直使用自定义 profile，请把两处 `web` 都换成自己的名称。
 
@@ -55,7 +62,9 @@ dsh --profile web
 
 切换 **精简请求头**，看到“设置已保存”即可。之后照常使用原来的 DeepSeek 模型，API Key、模型和地址继续沿用。
 
-![请求隐私设置：开启](docs/images/settings-on.png)
+界面跟随 DSH 的全局语言设置：全局语言为中文时显示中文，切换为 English 时同步显示英文，无需单独配置插件语言。
+
+![请求隐私设置：跟随全局中文](docs/images/request-privacy-042-settings-zh.png)
 
 ## 开关什么时候生效？
 

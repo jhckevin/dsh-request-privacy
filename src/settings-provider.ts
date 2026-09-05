@@ -7,6 +7,30 @@ import type { RequestPrivacyPreview } from './privacy.ts'
 
 const NS = REQUEST_PRIVACY_SETTINGS_NAMESPACE
 
+function assertExactRequest(
+  request: unknown,
+  operation: 'update' | 'reset',
+  expectedKeys: readonly string[],
+): asserts request is Record<string, unknown> {
+  if (typeof request !== 'object' || request === null || Array.isArray(request)) {
+    throw new TypeError(`request-privacy: ${operation} request must be a plain object`)
+  }
+  const prototype = Object.getPrototypeOf(request)
+  if (prototype !== Object.prototype && prototype !== null) {
+    throw new TypeError(`request-privacy: ${operation} request must be a plain object`)
+  }
+  const keys = Reflect.ownKeys(request)
+  if (
+    keys.length !== expectedKeys.length
+    || keys.some(key => typeof key !== 'string' || !expectedKeys.includes(key))
+    || expectedKeys.some(key => !Object.hasOwn(request, key))
+  ) {
+    throw new TypeError(
+      `request-privacy: ${operation} request must contain exactly ${expectedKeys.join(', ')}`,
+    )
+  }
+}
+
 export interface RequestPrivacySettingsSnapshot {
   readonly enabled: boolean
   readonly identity: 'private-client'
@@ -40,9 +64,7 @@ export class RequestPrivacySettingsBridge extends TypertRemoteService {
 
   @Remote('update')
   async update(request: RequestPrivacySettingsUpdate): Promise<RequestPrivacySettingsSnapshot> {
-    if (typeof request !== 'object' || request === null || Array.isArray(request)) {
-      throw new TypeError('request-privacy: update request must be an object')
-    }
+    assertExactRequest(request, 'update', ['enabled', 'expectedRevision'])
     if (typeof request.enabled !== 'boolean') {
       throw new TypeError('request-privacy: enabled must be a boolean')
     }
@@ -55,9 +77,7 @@ export class RequestPrivacySettingsBridge extends TypertRemoteService {
 
   @Remote('reset')
   async reset(request: RequestPrivacySettingsReset): Promise<RequestPrivacySettingsSnapshot> {
-    if (typeof request !== 'object' || request === null || Array.isArray(request)) {
-      throw new TypeError('request-privacy: reset request must be an object')
-    }
+    assertExactRequest(request, 'reset', ['expectedRevision'])
     if (!Number.isSafeInteger(request.expectedRevision) || request.expectedRevision < 0) {
       throw new TypeError('request-privacy: expectedRevision must be a non-negative safe integer')
     }

@@ -128,4 +128,24 @@ describe('native DeepSeek route: live settings to real HTTP wire', () => {
     await f.owner.dispose()
     expect(f.ctx.llm.listProviders().map(provider => provider.id)).not.toContain('deepseek-official')
   })
+
+  it('accepts only exact settings RPC shapes and resets the override atomically', async () => {
+    const f = await fixture()
+    const revision = f.bridge.read().revision
+    for (const request of [
+      null,
+      [],
+      { enabled: false },
+      { enabled: false, expectedRevision: revision, extra: true },
+      Object.assign(Object.create({ enabled: false }), { expectedRevision: revision }),
+    ]) {
+      await expect(f.bridge.update(request as never)).rejects.toThrow(/plain object|exactly/)
+    }
+    await expect(f.bridge.reset({ expectedRevision: revision, extra: true } as never)).rejects.toThrow(/exactly/)
+
+    const changed = await f.bridge.update({ enabled: false, expectedRevision: revision })
+    expect(changed).toMatchObject({ enabled: false, overridden: true })
+    const reset = await f.bridge.reset({ expectedRevision: changed.revision })
+    expect(reset).toMatchObject({ enabled: true, overridden: false })
+  })
 })
