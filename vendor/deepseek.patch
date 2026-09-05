@@ -1,0 +1,52 @@
+--- upstream/@deepseek-ai/dsh-llm-deepseek/lib/index.js
++++ vendor/deepseek.js
+@@ -1,4 +1,6 @@
+ import z from "@deepseek-ai/schemastery";
++// Upstream MIT adapter, DSH 0.1.2-rc.1. Local changes are limited to chat attribution.
++import { privacyHeaders, DEFAULT_REQUEST_PRIVACY_CONFIG } from "../lib/privacy.js";
+ import { CONTEXT_WINDOW_EXCEEDED_CODE, EMPTY_RESPONSE_CODE, LlmAdapter, LlmError, ProviderRequestId, QUOTA_EXCEEDED_CODE, ReasoningEffortId, RetryPolicySchema, assertUsableApiKey, attributionHeaders, contentHasImage, isContextWindowExceededError, isQuotaExceededError, offloadRequestImagesWithPolicy, offloadedImagePrefixCount, offloadedImageText, requestImageHandleText, resolveImageAttachmentAccess, resolveRetryPolicy, textOnlyImageText } from "@deepseek-ai/dsh-llm";
+ import { credentialRef } from "@deepseek-ai/dsh-credentials";
+ import { launchEnvironmentOf } from "@deepseek-ai/dsh-launch-environment";
+@@ -1593,6 +1595,8 @@
+ 		return this.streamWithConnection(options, this.config.options());
+ 	}
+ 	async *streamWithConnection(options, connection) {
++		// One mode per dispatched request, including retries and existing sessions.
++		connection = { ...connection, requestPrivacyEnabled: this.config.requestPrivacyEnabled?.() ?? false };
+ 		const env_1 = {
+ 			stack: [],
+ 			error: void 0,
+@@ -1646,10 +1650,12 @@
+ 			"authorization": `Bearer ${apiKey}`,
+ 			"content-type": "application/json",
+ 			"accept": "text/event-stream",
+-			...attributionHeaders(),
+-			"x-deepseek-harness-user-id": String(userId),
+-			...options.sessionId !== void 0 ? { "x-deepseek-harness-session-id": String(options.sessionId) } : {},
+-			...options.purpose === "compaction" ? { "x-deepseek-harness-compact": "1" } : {}
++			...connection.requestPrivacyEnabled ? privacyHeaders(DEFAULT_REQUEST_PRIVACY_CONFIG) : {
++				...attributionHeaders(),
++				"x-deepseek-harness-user-id": String(userId),
++				...options.sessionId !== void 0 ? { "x-deepseek-harness-session-id": String(options.sessionId) } : {},
++				...options.purpose === "compaction" ? { "x-deepseek-harness-compact": "1" } : {}
++			}
+ 		};
+ 		const fileConnection = {
+ 			baseURL: connection.baseURL,
+@@ -1986,7 +1992,7 @@
+ 		retryPolicy: resolveRetryPolicy(config.retryPolicy, "llm-deepseek: retryPolicy")
+ 	};
+ }
+-function apply(ctx, config) {
++function apply(ctx, config, requestPrivacyEnabled = () => false) {
+ 	let current = () => config;
+ 	let lastRaw;
+ 	let lastGood;
+@@ -2022,6 +2028,7 @@
+ 	let userId;
+ 	const resolveUserId = () => userId ??= getOrCreateAnonymousUserId();
+ 	const adapter = new DeepSeekAdapter({
++		requestPrivacyEnabled,
+ 		options,
+ 		resolveApiKey,
+ 		resolveUserId,

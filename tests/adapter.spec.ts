@@ -18,9 +18,13 @@ async function listen(handler: Parameters<typeof createServer>[0]): Promise<{ ur
   return { url: `http://127.0.0.1:${address.port}`, server }
 }
 
-function adapter(baseURL: string, lifecycleSignal?: AbortSignal): DeepSeekAdapter {
+function adapter(
+  baseURL: string,
+  lifecycleSignal?: AbortSignal,
+  overrides: Record<string, unknown> = {},
+): DeepSeekAdapter {
   return new DeepSeekAdapter({
-    options: () => resolveAdapterOptions({ baseURL }),
+    options: () => resolveAdapterOptions({ baseURL, ...overrides }),
     resolveApiKey: () => Promise.resolve('test-key'),
     lifecycleSignal,
   })
@@ -72,6 +76,78 @@ describe('wire metadata', () => {
     })
     await expect(consume(adapter(origin.url))).rejects.toMatchObject({ code: 'TRANSPORT' })
     expect(targetHits).toBe(0)
+  })
+
+  it('preserves stable HTTP error metadata for retry and diagnosis', async () => {
+    const mock = await listen((request, response) => {
+      request.resume()
+      request.on('end', () => {
+        response.writeHead(429, {
+          'content-type': 'application/json',
+          'retry-after': '2',
+          'x-request-id': 'request-test-1',
+        })
+        response.end(JSON.stringify({ error: { message: 'slow down', type: 'rate_limit' } }))
+      })
+    })
+    await expect(consume(adapter(mock.url))).rejects.toMatchObject({
+      code: 'RATE_LIMIT',
+      failure: {
+        code: 'RATE_LIMIT',
+        status: 429,
+        providerRetryAfterMs: 2_000,
+        requestId: 'request-test-1',
+      },
+    })
+  })
+
+  it('rejects a truncated SSE response even when it contains a finish reason', async () => {
+    const mock = await listen((request, response) => {
+      request.resume()
+      request.on('end', () => {
+        response.writeHead(200, { 'content-type': 'text/event-stream' })
+        response.end('data: {"choices":[{"delta":{"content":"partial"},"finish_reason":"stop"}]}\n\n')
+      })
+    })
+    await expect(consume(adapter(mock.url))).rejects.toMatchObject({ code: 'STREAM_CLOSED' })
+  })
+
+  it('maps caller cancellation separately from plugin lifecycle cancellation', async () => {
+    const started = Promise.withResolvers<void>()
+    const closed = Promise.withResolvers<void>()
+    const mock = await listen((request, response) => {
+      request.resume()
+      request.on('end', () => {
+        response.writeHead(200, { 'content-type': 'text/event-stream' })
+        response.write(': stream-open\n\n')
+        started.resolve()
+      })
+      response.on('close', () => { closed.resolve() })
+    })
+    const caller = new AbortController()
+    const pending = consume(adapter(mock.url), { signal: caller.signal })
+    await started.promise
+    caller.abort('test caller cancellation')
+    await expect(pending).rejects.toMatchObject({ code: 'ABORTED' })
+    await closed.promise
+  })
+
+  it('terminates a silent provider stream at the configured idle deadline', async () => {
+    const started = Promise.withResolvers<void>()
+    const closed = Promise.withResolvers<void>()
+    const mock = await listen((request, response) => {
+      request.resume()
+      request.on('end', () => {
+        response.writeHead(200, { 'content-type': 'text/event-stream' })
+        response.write(': stream-open\n\n')
+        started.resolve()
+      })
+      response.on('close', () => { closed.resolve() })
+    })
+    const pending = consume(adapter(mock.url, undefined, { streamIdleTimeoutMs: 30 }))
+    await started.promise
+    await expect(pending).rejects.toMatchObject({ code: 'TIMEOUT' })
+    await closed.promise
   })
 
   it('aborts an active provider stream when the owning plugin unloads', async () => {

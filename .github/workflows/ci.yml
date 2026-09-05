@@ -25,6 +25,14 @@ jobs:
           npx vitest run --reporter=junit --outputFile=artifacts/junit.xml
       - name: Verify distributable
         run: node scripts/check-release.mjs
+      - name: Install, upgrade and remove the packed plugin through DSH
+        run: npm run e2e:packed-dsh
+      - name: Replay the bounded upstream adapter patch
+        shell: bash
+        run: |
+          mkdir -p artifacts/upstream
+          npm pack @deepseek-ai/dsh-llm-deepseek@0.1.2-rc.1 --ignore-scripts --pack-destination artifacts/upstream --registry=https://registry.npmmirror.com
+          node scripts/check-vendor-provenance.mjs --upstream-tarball artifacts/upstream/deepseek-ai-dsh-llm-deepseek-0.1.2-rc.1.tgz
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:

@@ -25,7 +25,7 @@ for (const file of ['README.md', 'README.en.md']) {
 mkdirSync('artifacts', { recursive: true })
 const pack = JSON.parse(run('npm', ['pack', '--ignore-scripts', '--json', '--pack-destination', 'artifacts']))[0]
 const paths = new Set(pack.files.map(file => file.path))
-for (const required of ['lib/index.js', 'lib/client.js', 'lib/native-provider.js', 'vendor/deepseek.js', 'vendor/deepseek.d.ts', 'cordis.patch.yml', 'README.md', 'README.en.md', 'LICENSE', 'THIRD_PARTY_NOTICES.md']) assert(paths.has(required), 'Missing packed file: ' + required)
+for (const required of ['lib/index.js', 'lib/client.js', 'lib/native-provider.js', 'vendor/deepseek.js', 'vendor/deepseek.d.ts', 'vendor/upstream-provenance.json', 'vendor/deepseek.patch', 'cordis.patch.yml', 'README.md', 'README.en.md', 'LICENSE', 'THIRD_PARTY_NOTICES.md']) assert(paths.has(required), 'Missing packed file: ' + required)
 for (const path of paths) assert(!/(^|\/)(node_modules|acceptance|artifacts|\.env)(\/|$)/.test(path), 'Unexpected packed path: ' + path)
 const artifact = resolve('artifacts', pack.filename)
 const sha = createHash('sha256').update(readFileSync(artifact)).digest('hex')
@@ -34,7 +34,7 @@ const consumer = mkdtempSync(join(tmpdir(), 'privacy-consumer-'))
 try {
   writeFileSync(join(consumer, 'package.json'), '{"private":true,"type":"module"}\n')
   run('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund',
-    '--registry=https://registry.npmmirror.com', artifact], consumer)
+    '--registry=https://registry.npmmirror.com', '@deepseek-ai/dsh@0.1.2-rc.1', artifact], consumer)
   run(process.execPath, ['--input-type=module', '-e',
     "const m=await import('dsh-request-privacy'); const n=await import('dsh-request-privacy/native-provider'); if(typeof m.DeepSeekAdapter!=='function'||typeof m.resolveAdapterOptions!=='function'||typeof n.apply!=='function')throw Error('packed imports missing');"], consumer)
 } finally {
@@ -44,6 +44,6 @@ writeFileSync('artifacts/release-check.json', JSON.stringify({
   package: manifest.name, version: manifest.version, dsh: manifest.peerDependencies['@deepseek-ai/dsh-llm'],
   sourceCommit: run('git', ['rev-parse', 'HEAD']).trim(),
   node: process.version, sha256: sha, packedFiles: paths.size,
-  cleanConsumerImport: true, sourceCredentialScan: true, modelApiCalled: false,
+  hostConsumerImport: true, sourceCredentialScan: true, modelApiCalled: false,
 }, null, 2) + '\n')
-console.log('Release checks passed: packed contents, clean consumer import, documentation and credential scan')
+console.log('Release checks passed: packed contents, DSH host import, documentation and credential scan')

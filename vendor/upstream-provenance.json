@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "upstream": {
+    "package": "@deepseek-ai/dsh-llm-deepseek",
+    "version": "0.1.2-rc.1",
+    "tarballSha256": "4ea64daee7fc572f217bfdfb3b44cfd4e11148e759f543d8f26cfc58b1b542b3",
+    "entry": "package/lib/index.js",
+    "entrySha256": "5c598e3b6c35c8f302d4f7ae0b1812cabf77483cf2f6f5986d0cd6b7785d3acb"
+  },
+  "local": {
+    "entry": "vendor/deepseek.js",
+    "entrySha256": "283500d8468b7be2857d12fce7419e00253e999b7aa512989d6c8824df1e21fc",
+    "declaration": "vendor/deepseek.d.ts",
+    "declarationSha256": "6afd402ea661caebf4305c6e4716c42a6d59a815a1971988e9f170ebd5f57571",
+    "patch": "vendor/deepseek.patch",
+    "patchSha256": "2e4f7c00ae44e4022a5a6f2bae3aa0429bfd91056667c561905f50433d608d5b"
+  }
+}

@@ -9,7 +9,7 @@ One switch to reduce extra correlation metadata in DeepSeek Harness chat request
 
 > This is not an official training opt-out. It cannot guarantee that a provider will not retain, filter or train on data. API keys, chat content and tool descriptions are still sent. File uploads, telemetry and other providers are outside its scope. [Privacy limits](https://deepseek.com/harness/en/data-processing/)
 
-**Version: 0.4.1-rc.1 · DSH 0.1.2-rc.1 · Linux x86-64** · [npm](https://www.npmjs.com/package/dsh-request-privacy)
+**Version: 0.4.2-rc.2 · DSH 0.1.2-rc.1 · Linux x86-64** · [npm](https://www.npmjs.com/package/dsh-request-privacy)
 
 ## Install in three steps
 
@@ -45,7 +45,7 @@ The first command installs the plugin; the second starts the WebUI. No source ch
 
 This is a public prebuilt package: users do not need an npm account or publishing token. The official registry avoids mirror synchronization delays for a new release. Do not substitute `npm install -g dsh-request-privacy`: DSH needs the bundle in its profile.
 
-For file-based installation, download the `.tgz` from [GitHub Releases](https://github.com/jhckevin/dsh-request-privacy/releases) and replace `dsh-request-privacy@0.4.1-rc.1` in the command with the local file path. Do not extract it.
+For file-based installation, download the `.tgz` from [GitHub Releases](https://github.com/jhckevin/dsh-request-privacy/releases) and replace `dsh-request-privacy@0.4.2-rc.2` in the command with the local file path. Do not extract it.
 
 **Restart DSH once after first installation. A browser refresh is not enough.** Install and start using the same profile. This guide uses the standard `web` profile; if you use a custom profile, replace both occurrences of `web`.
 
@@ -55,7 +55,16 @@ Open the URL printed by DSH → **Settings** at the bottom left → **Request Pr
 
 Toggle **Minimize request headers** and wait for the saved confirmation. Keep using your usual DeepSeek model; stored credentials, model and endpoint settings are reused.
 
+The page follows the global DSH language: it is Chinese when DSH is set to Chinese and switches to English with the global preference. There is no separate plugin language setting.
+
 ![Request Privacy enabled](docs/images/settings-on-en.png)
+
+The npm command installs the published `0.4.1-rc.1`. The `0.4.2-rc.2` candidate described here is available from [GitHub Releases](https://github.com/jhckevin/dsh-request-privacy/releases/tag/v0.4.2-rc.2), not npm yet. Download its tarball and install with:
+
+```sh
+dsh plugin --profile web add ./dsh-request-privacy-0.4.2-rc.2.tgz --ignore-scripts
+dsh --profile web
+```
 
 ## When does the switch take effect?
 
